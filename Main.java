@@ -18,10 +18,14 @@ public class Main {
         do {
             userInput = scan.nextLine();
             switch (userInput) {
+                case "add students" -> addStudents();
                 case "exit" -> System.out.println("Bye!");
                 default -> validateNonExpectedInput(userInput);
             }
         } while (!"exit".equals(userInput));
+    }
+
+    private static void addStudents() {
     }
 
     private static void validateNonExpectedInput(String userInput) {
