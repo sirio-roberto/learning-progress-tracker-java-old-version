@@ -15,8 +15,23 @@ public class Student {
         this.emailAddress = emailAddress;
     }
 
+    public Student(String[] credentials) {
+        this.firstName = credentials[0];
+        this.lastName = getLastNameFromCredentials(credentials);
+        this.emailAddress = credentials[credentials.length - 1];
+    }
+
+    private String getLastNameFromCredentials(String[] credentials) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 1; i < credentials.length - 1; i++) {
+            result.append(credentials[i]).append(" ");
+        }
+        return result.toString().trim();
+    }
+
     public static boolean isValidCredentials(String userInput) {
         if (userInput == null || userInput.isBlank()) {
+            System.out.println("Incorrect credentials.");
             return false;
         }
         String[] fields = userInput.split(" ");
@@ -31,10 +46,10 @@ public class Student {
     }
 
     private static boolean isValidEmailAddress(String emailAddress) {
-        Matcher validEmail = Pattern.compile("\\w+[.-]*\\w+@\\w+\\.[a-z]+").matcher(emailAddress);
+        Matcher validEmail = Pattern.compile("\\w+[.-]*\\w*@\\w+\\.[a-zA-Z-0-9]+").matcher(emailAddress);
         boolean isValid = validEmail.matches();
         if (!isValid) {
-            System.out.println("Incorrect email");
+            System.out.println("Incorrect email.");
             return false;
         }
         return true;
@@ -42,13 +57,13 @@ public class Student {
 
     private static boolean isValidLastName(String[] lastName) {
         if (lastName.length == 1 && lastName[0].length() < 2) {
-            System.out.println("Incorrect last name");
+            System.out.println("Incorrect last name.");
             return false;
         }
         for (String name: lastName) {
             boolean isValid = isValidName(name);
             if (!isValid) {
-                System.out.println("Incorrect last name");
+                System.out.println("Incorrect last name.");
                 return false;
             }
         }
@@ -57,12 +72,12 @@ public class Student {
 
     private static boolean isValidFirstName(String firstName) {
         if (firstName.length() < 2) {
-            System.out.println("Incorrect first name");
+            System.out.println("Incorrect first name.");
             return false;
         }
         boolean isValid = isValidName(firstName);
         if (!isValid) {
-            System.out.println("Incorrect first name");
+            System.out.println("Incorrect first name.");
         }
         return isValid;
     }
