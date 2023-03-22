@@ -1,24 +1,36 @@
 package tracker;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Student {
+    private final String id;
     private String firstName;
     private String lastName;
     private String emailAddress;
 
+
     public Student(String firstName, String lastName, String emailAddress) {
+        this.id = generateRandomId();
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
     }
 
     public Student(String[] credentials) {
+        this.id = generateRandomId();
         this.firstName = credentials[0];
         this.lastName = getLastNameFromCredentials(credentials);
         this.emailAddress = credentials[credentials.length - 1];
+    }
+
+    private String generateRandomId() {
+        Random random = new Random();
+        int intId = random.nextInt(1, 99999);
+        return String.format("%5d", intId);
     }
 
     private String getLastNameFromCredentials(String[] credentials) {
@@ -27,6 +39,30 @@ public class Student {
             result.append(credentials[i]).append(" ");
         }
         return result.toString().trim();
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public static boolean isValidCredentials(String userInput) {
@@ -86,5 +122,18 @@ public class Student {
         Matcher validCharacters = Pattern.compile("^[a-zA-Z]+[a-zA-Z'-]*[a-zA-Z]+$").matcher(name);
         Matcher doubleSymbols = Pattern.compile("['-]{2,}").matcher(name);
         return validCharacters.matches() && !doubleSymbols.find();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return id.equals(student.id) || emailAddress.equals(student.emailAddress);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, emailAddress);
     }
 }
