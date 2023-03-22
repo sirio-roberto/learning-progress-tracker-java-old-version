@@ -12,12 +12,15 @@ public class Student {
     private String lastName;
     private String emailAddress;
 
+    private Course[] courses;
+
 
     public Student(String firstName, String lastName, String emailAddress) {
         this.id = generateRandomId();
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
+        instantiateCourses();
     }
 
     public Student(String[] credentials) {
@@ -25,6 +28,16 @@ public class Student {
         this.firstName = credentials[0];
         this.lastName = getLastNameFromCredentials(credentials);
         this.emailAddress = credentials[credentials.length - 1];
+        instantiateCourses();
+    }
+
+    private void instantiateCourses() {
+        courses = new Course[] {
+                new Course("Java"),
+                new Course("Data Structures and Algorithms (DSA)"),
+                new Course("Databases"),
+                new Course("Spring")
+        };
     }
 
     private String generateRandomId() {
@@ -39,6 +52,10 @@ public class Student {
             result.append(credentials[i]).append(" ");
         }
         return result.toString().trim();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getFirstName() {
@@ -122,6 +139,12 @@ public class Student {
         Matcher validCharacters = Pattern.compile("^[a-zA-Z]+[a-zA-Z'-]*[a-zA-Z]+$").matcher(name);
         Matcher doubleSymbols = Pattern.compile("['-]{2,}").matcher(name);
         return validCharacters.matches() && !doubleSymbols.find();
+    }
+
+    public void addPointsToCourses(int[] points) {
+        for (int i = 0; i < courses.length; i++) {
+            courses[i].addPoints(points[i]);
+        }
     }
 
     @Override
