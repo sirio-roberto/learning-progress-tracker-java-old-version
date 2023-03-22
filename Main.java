@@ -32,6 +32,42 @@ public class Main {
 
     private static void addPoints() {
         System.out.println("Enter an id and points or 'back' to return:");
+        String userInput = scan.nextLine();
+        while (!"back".equals(userInput)) {
+            if (!isValidPointInput(userInput)) {
+                userInput = scan.nextLine();
+            }
+            String[] inputFields = userInput.split(" ");
+            Optional<Student> student = students.stream().filter(s -> s.getId().equals(inputFields[0])).findAny();
+            if (student.isPresent()) {
+                int[] points = Arrays.stream(inputFields).skip(1).mapToInt(Integer::parseInt).toArray();
+                student.get().addPointsToCourses(points);
+                System.out.println("Points updated.");
+            }
+            // TODO this should never happen
+            System.out.println("Error while updating points.");
+        }
+    }
+
+    private static boolean isValidPointInput(String userInput) {
+        if (userInput == null || userInput.isBlank()) {
+            System.out.println("Incorrect point input.");
+            return false;
+        }
+        String[] inputFields = userInput.split(" ");
+        String studentId = inputFields[0];
+        if (students.stream().map(Student::getId).noneMatch(i -> i.equals(studentId))) {
+            System.out.printf("No student is found for id=%s.%n", studentId);
+            return false;
+        }
+        if (inputFields.length == 5) {
+            int[] points = Arrays.stream(inputFields).skip(1).mapToInt(Integer::parseInt).toArray();
+            if (Arrays.stream(points).allMatch(i -> i > 0)) {
+                return true;
+            }
+        }
+        System.out.println("Incorrect points format.");
+        return false;
     }
 
     private static void listStudents() {
