@@ -152,7 +152,7 @@ public class Student {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return id.equals(student.id) || emailAddress.equals(student.emailAddress);
+        return id.equals(student.id) && emailAddress.equals(student.emailAddress);
     }
 
     @Override

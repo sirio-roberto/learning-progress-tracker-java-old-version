@@ -89,9 +89,15 @@ public class Main {
             credentialsOrBack = scan.nextLine();
             if (!credentialsOrBack.equals("back")) {
                 if (Student.isValidCredentials(credentialsOrBack)) {
-                    students.add(new Student(credentialsOrBack.split(" ")));
-                    addedStudents++;
-                    System.out.println("The student has been added.");
+                    Student newStudent = new Student(credentialsOrBack.split(" "));
+                    if (students.stream().map(Student::getEmailAddress)
+                            .anyMatch(email -> email.equals(newStudent.getEmailAddress()))) {
+                        System.out.println("This email is already taken.");
+                    } else {
+                        students.add(newStudent);
+                        addedStudents++;
+                        System.out.println("The student has been added.");
+                    }
                 }
             }
         } while (!credentialsOrBack.equals("back"));
