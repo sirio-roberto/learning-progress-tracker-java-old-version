@@ -34,7 +34,7 @@ public class Student {
     private void instantiateCourses() {
         courses = new Course[] {
                 new Course("Java"),
-                new Course("Data Structures and Algorithms (DSA)"),
+                new Course("DSA"),
                 new Course("Databases"),
                 new Course("Spring")
         };
@@ -43,7 +43,7 @@ public class Student {
     private String generateRandomId() {
         Random random = new Random();
         int intId = random.nextInt(1, 99999);
-        return String.format("%5d", intId);
+        return String.format("%05d", intId);
     }
 
     private String getLastNameFromCredentials(String[] credentials) {
@@ -80,6 +80,10 @@ public class Student {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public Course[] getCourses() {
+        return courses;
     }
 
     public static boolean isValidCredentials(String userInput) {

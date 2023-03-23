@@ -23,6 +23,7 @@ public class Main {
                 case "add students" -> addStudents();
                 case "list" -> listStudents();
                 case "add points" -> addPoints();
+                case "find" -> findStudent();
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 case "exit" -> System.out.println("Bye!");
                 default -> validateNonExpectedInput(userInput);
@@ -30,12 +31,40 @@ public class Main {
         } while (!"exit".equals(userInput));
     }
 
+    private static void findStudent() {
+        System.out.println("Enter an id or 'back' to return:");
+        String userInput = scan.nextLine();
+        while (!"back".equals(userInput)) {
+            Student student = getStudentById(userInput);
+            if (student == null) {
+                System.out.printf("No student is found for id=%s.%n", userInput);
+            } else {
+                StringBuilder score = new StringBuilder(userInput);
+                score.append(" points:");
+                for(Course course: student.getCourses()) {
+                    score.append(" ").append(course).append(";");
+                }
+                score.deleteCharAt(score.length() - 1);
+                System.out.println(score);
+            }
+
+            userInput = scan.nextLine();
+        }
+    }
+
+    private static Student getStudentById(String userInput) {
+        return students.stream().filter(s -> s.getId().equals(userInput)).findAny().orElse(null);
+    }
+
     private static void addPoints() {
         System.out.println("Enter an id and points or 'back' to return:");
         String userInput = scan.nextLine();
         while (!"back".equals(userInput)) {
-            if (!isValidPointInput(userInput)) {
+            while (!isValidPointInput(userInput)) {
                 userInput = scan.nextLine();
+                if ("back".equals(userInput)) {
+                    break;
+                }
             }
             String[] inputFields = userInput.split(" ");
             Optional<Student> student = students.stream().filter(s -> s.getId().equals(inputFields[0])).findAny();
@@ -44,8 +73,8 @@ public class Main {
                 student.get().addPointsToCourses(points);
                 System.out.println("Points updated.");
             }
-            // TODO this should never happen
-            System.out.println("Error while updating points.");
+
+            userInput = scan.nextLine();
         }
     }
 
@@ -61,10 +90,20 @@ public class Main {
             return false;
         }
         if (inputFields.length == 5) {
-            int[] points = Arrays.stream(inputFields).skip(1).mapToInt(Integer::parseInt).toArray();
-            if (Arrays.stream(points).allMatch(i -> i > 0)) {
-                return true;
+            String[] strPoints = Arrays.stream(inputFields).skip(1).toArray(String[]::new);
+            int[] points = new int[4];
+            for (int i = 0; i < points.length; i++) {
+                try {
+                    points[i] = Integer.parseInt(strPoints[i]);
+                    if (points[i] < 0) {
+                        throw new NumberFormatException("Negative number is not allowed");
+                    }
+                } catch (NumberFormatException ex) {
+                    System.out.println("Incorrect points format.");
+                    return false;
+                }
             }
+            return true;
         }
         System.out.println("Incorrect points format.");
         return false;

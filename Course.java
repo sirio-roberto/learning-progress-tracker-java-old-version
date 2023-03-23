@@ -1,7 +1,7 @@
 package tracker;
 
 public class Course {
-    private String name;
+    private final String name;
     private int points;
 
     public Course(String name) {
@@ -11,5 +11,10 @@ public class Course {
 
     public void addPoints(int points) {
         this.points += points;
+    }
+
+    @Override
+    public String toString() {
+        return name.concat("=").concat(String.valueOf(points));
     }
 }
