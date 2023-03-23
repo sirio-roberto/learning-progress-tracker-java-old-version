@@ -33,10 +33,10 @@ public class Student {
 
     private void instantiateCourses() {
         courses = new Course[] {
-                new Course("Java"),
-                new Course("DSA"),
-                new Course("Databases"),
-                new Course("Spring")
+                new Course("Java", 600),
+                new Course("DSA", 400),
+                new Course("Databases", 480),
+                new Course("Spring", 550)
         };
     }
 

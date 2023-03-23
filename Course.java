@@ -4,9 +4,12 @@ public class Course {
     private final String name;
     private int points;
 
-    public Course(String name) {
+    private int pointsToComplete;
+
+    public Course(String name, int pointsToComplete) {
         this.name = name;
         this.points = 0;
+        this.pointsToComplete = pointsToComplete;
     }
 
     public void addPoints(int points) {
