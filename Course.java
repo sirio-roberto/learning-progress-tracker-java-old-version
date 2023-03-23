@@ -12,6 +12,14 @@ public class Course {
         this.pointsToComplete = pointsToComplete;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
     public void addPoints(int points) {
         this.points += points;
     }

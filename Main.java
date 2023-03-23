@@ -1,11 +1,14 @@
 package tracker;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     static Scanner scan = new Scanner(System.in);
 
     static HashSet<Student> students = new LinkedHashSet<>();
+
+    static Map<String, Integer> popularityMap = new HashMap<>();
     public static void main(String[] args) {
         startProgram();
     }
@@ -24,11 +27,53 @@ public class Main {
                 case "list" -> listStudents();
                 case "add points" -> addPoints();
                 case "find" -> findStudent();
+                case "statistics" -> showStatistics();
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 case "exit" -> System.out.println("Bye!");
                 default -> validateNonExpectedInput(userInput);
             }
         } while (!"exit".equals(userInput));
+    }
+
+    private static void showStatistics() {
+        System.out.println("Type the name of a course to see details or 'back' to quit:");
+        String mostPopular = getMostPopular();
+        System.out.printf("Most popular: %s%n", mostPopular);
+        System.out.printf("Least popular: %s%n", mostPopular.equals("n/a") ? "n/a" : getLeastPopular());
+    }
+
+    private static String getLeastPopular() {
+        int min = popularityMap.values().stream().min(Integer::compareTo).orElse(0);
+        return popularityMap.keySet().stream()
+                .filter(k -> popularityMap.get(k) == min)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String getMostPopular() {
+        popularityMap = getCurrentPopularity();
+        int max = popularityMap.values().stream().max(Integer::compareTo).orElse(0);
+        if (max == 0) {
+            return "n/a";
+        }
+        return popularityMap.keySet().stream()
+                .filter(k -> popularityMap.get(k) == max)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static Map<String, Integer> getCurrentPopularity() {
+        Map<String, Integer> map = new HashMap<>();
+        for(Student student: students) {
+            for (Course course: student.getCourses()) {
+                if(!map.containsKey(course.getName())) {
+                    map.put(course.getName(), course.getPoints() > 0 ? 1 : 0);
+                } else {
+                    if (course.getPoints() > 0) {
+                        map.put(course.getName(), map.get(course.getName()) + 1);
+                    }
+                }
+            }
+        }
+        return map;
     }
 
     private static void findStudent() {
