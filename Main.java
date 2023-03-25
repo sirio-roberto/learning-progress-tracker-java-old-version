@@ -50,6 +50,8 @@ public class Main {
 
         System.out.printf("Easiest activity: %s%n", getEasiestCourse());
         System.out.printf("Hardest activity: %s%n", getHardestCourse());
+
+        String userInput = scan.nextLine();
     }
 
     private static String getHardestCourse() {
