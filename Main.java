@@ -9,6 +9,10 @@ public class Main {
     static HashSet<Student> students = new LinkedHashSet<>();
 
     static Map<String, Integer> popularityMap = new HashMap<>();
+
+    static Map<String, Integer> activityMap = new HashMap<>();
+
+    static Map<String, Double> difficultyMap = new HashMap<>();
     public static void main(String[] args) {
         startProgram();
     }
@@ -39,10 +43,90 @@ public class Main {
         System.out.println("Type the name of a course to see details or 'back' to quit:");
         String mostPopular = getMostPopular();
         System.out.printf("Most popular: %s%n", mostPopular);
-        System.out.printf("Least popular: %s%n", mostPopular.equals("n/a") ? "n/a" : getLeastPopular());
+        System.out.printf("Least popular: %s%n", getLeastPopular(mostPopular));
+
+        System.out.printf("Highest activity: %s%n", getHighestActivity());
+        System.out.printf("Lowest activity: %s%n", getLowestActivity());
+
+        System.out.printf("Easiest activity: %s%n", getEasiestCourse());
+        System.out.printf("Hardest activity: %s%n", getHardestCourse());
     }
 
-    private static String getLeastPopular() {
+    private static String getHardestCourse() {
+        if (difficultyMap.isEmpty()) {
+            return "n/a";
+        }
+        double minAvg = difficultyMap.values().stream()
+                .filter(v -> v != 0.0).min(Double::compareTo).orElse(0.0);
+        if (minAvg == 0.0) {
+            return "n/a";
+        }
+        return difficultyMap.keySet().stream()
+                .filter(k -> difficultyMap.get(k) == minAvg)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String getEasiestCourse() {
+        fillDifficultyMap();
+        if (difficultyMap.isEmpty()) {
+            return "n/a";
+        }
+        double maxAvg = difficultyMap.values().stream().max(Double::compareTo).orElse(0.0);
+        if (maxAvg == 0.0) {
+            return "n/a";
+        }
+        return difficultyMap.keySet().stream()
+                .filter(k -> difficultyMap.get(k) == maxAvg)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static void fillDifficultyMap() {
+        if (!activityMap.isEmpty()) {
+            for (String k: activityMap.keySet()) {
+                difficultyMap.put(k, 0.0);
+            }
+            for (Student student: students) {
+                for (Course course: student.getCourses()) {
+                    String key = course.getName();
+                    difficultyMap.put(key, difficultyMap.get(key) + course.getPoints());
+                }
+            }
+            for (String k: activityMap.keySet()) {
+                double avgValue = 0.0;
+                if (activityMap.get(k) > 0) {
+                    avgValue = difficultyMap.get(k) / activityMap.get(k);
+                }
+                difficultyMap.put(k, avgValue);
+            }
+        }
+    }
+
+    private static String getLowestActivity() {
+        if (activityMap.isEmpty() ||
+                (activityMap.values().stream().distinct().count() == 1
+                && activityMap.values().stream().noneMatch(i -> i == 0))) {
+            return "n/a";
+        }
+        int minActivity = activityMap.values().stream().min(Integer::compareTo).orElse(0);
+        return activityMap.keySet().stream()
+                .filter(k -> activityMap.get(k) == minActivity)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String getHighestActivity() {
+        if (activityMap.isEmpty() || activityMap.values().stream().allMatch(i -> i == 0)) {
+            return "n/a";
+        }
+        int maxActivity = activityMap.values().stream().max(Integer::compareTo).orElse(0);
+        return activityMap.keySet().stream()
+                .filter(k -> activityMap.get(k) == maxActivity)
+                .collect(Collectors.joining(", "));
+    }
+
+    private static String getLeastPopular(String mostPopular) {
+        if (mostPopular.equals("n/a") || mostPopular.split(" ").length == popularityMap.size()) {
+            return  "n/a";
+        }
         int min = popularityMap.values().stream().min(Integer::compareTo).orElse(0);
         return popularityMap.keySet().stream()
                 .filter(k -> popularityMap.get(k) == min)
@@ -116,11 +200,31 @@ public class Main {
             if (student.isPresent()) {
                 int[] points = Arrays.stream(inputFields).skip(1).mapToInt(Integer::parseInt).toArray();
                 student.get().addPointsToCourses(points);
+                if (activityMap.isEmpty()) {
+                    startActivityTracking(student.get());
+                }
+                registerActivity(points);
                 System.out.println("Points updated.");
             }
 
             userInput = scan.nextLine();
         }
+    }
+
+    private static void registerActivity(int[] points) {
+        int i = 0;
+        for (String key: activityMap.keySet()) {
+            if (points[i] > 0) {
+                activityMap.put(key, activityMap.get(key) + 1);
+            }
+            i++;
+        }
+    }
+
+    private static void startActivityTracking(Student student) {
+        Arrays.stream(student.getCourses())
+                .map(Course::getName)
+                .forEach(course -> activityMap.put(course, 0));
     }
 
     private static boolean isValidPointInput(String userInput) {
