@@ -2,6 +2,7 @@ package tracker;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
     static Scanner scan = new Scanner(System.in);
@@ -48,10 +49,36 @@ public class Main {
         System.out.printf("Highest activity: %s%n", getHighestActivity());
         System.out.printf("Lowest activity: %s%n", getLowestActivity());
 
-        System.out.printf("Easiest activity: %s%n", getEasiestCourse());
-        System.out.printf("Hardest activity: %s%n", getHardestCourse());
+        System.out.printf("Easiest course: %s%n", getEasiestCourse());
+        System.out.printf("Hardest course: %s%n", getHardestCourse());
 
+        showSpecificCourseStatistics();
+    }
+
+    private static void showSpecificCourseStatistics() {
         String userInput = scan.nextLine();
+        while (!"back".equals(userInput)) {
+            String lowerCaseUserInput = userInput.toLowerCase();
+            if (Arrays.asList(CoursesEnum.getAllCourses(false)).contains(lowerCaseUserInput)) {
+                System.out.println(CoursesEnum.getCaseSensitiveName(lowerCaseUserInput));
+                System.out.println("id    points    completed");
+                List<Course> courses = students.stream()
+                        .map(Student::getCourses)
+                        .flatMap(Stream::of)
+                        .filter(c -> c.getName().toLowerCase().equals(lowerCaseUserInput))
+                        .filter(c -> c.getPoints() != 0)
+                        .sorted()
+                        .toList();
+                for (Course course: courses) {
+                    System.out.printf("%s %-10s%.1f%%\n",
+                            course.getEnrolledStudent().getId(), course.getPoints(), course.getCompletionPercentage());
+                }
+            } else {
+                System.out.println("Unknown course.");
+            }
+
+            userInput = scan.nextLine();
+        }
     }
 
     private static String getHardestCourse() {
