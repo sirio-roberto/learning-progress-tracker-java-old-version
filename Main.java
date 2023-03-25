@@ -33,11 +33,40 @@ public class Main {
                 case "add points" -> addPoints();
                 case "find" -> findStudent();
                 case "statistics" -> showStatistics();
+                case "notify" -> notifyCourseCompletion();
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 case "exit" -> System.out.println("Bye!");
                 default -> validateNonExpectedInput(userInput);
             }
         } while (!"exit".equals(userInput));
+    }
+
+    private static void notifyCourseCompletion() {
+        int notifiedUsers = 0;
+        if (!students.isEmpty()) {
+            List<Course> completedCourses = students.stream()
+                    .map(Student::getCourses)
+                    .flatMap(Stream::of)
+                    .filter(c -> !c.isCompleted())
+                    .filter(Course::checkCompletion)
+                    .toList();
+
+            for (Course course: completedCourses) {
+                notify(course);
+            }
+            notifiedUsers = (int) completedCourses.stream().map(Course::getEnrolledStudent).distinct().count();
+        }
+        System.out.printf("Total %d students have been notified.%n", notifiedUsers);
+    }
+
+    private static void notify(Course course) {
+        System.out.printf("""
+                To: %s
+                Re: Your Learning Progress
+                Hello, %s! You have accomplished our %s course!
+                """, course.getEnrolledStudent().getEmailAddress(),
+                     course.getEnrolledStudent().getFullName(),
+                     course.getName());
     }
 
     private static void showStatistics() {

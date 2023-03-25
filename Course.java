@@ -8,11 +8,14 @@ public class Course implements Comparable<Course> {
 
     private Student enrolledStudent;
 
+    private boolean completed;
+
     public Course(String name, int pointsToComplete, Student enrolledStudent) {
         this.name = name;
         this.points = 0;
         this.pointsToComplete = pointsToComplete;
         this.enrolledStudent = enrolledStudent;
+        this.completed = false;
     }
 
     public String getName() {
@@ -25,6 +28,17 @@ public class Course implements Comparable<Course> {
 
     public Student getEnrolledStudent() {
         return enrolledStudent;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public boolean checkCompletion() {
+        if (points >= pointsToComplete) {
+            this.completed = true;
+        }
+        return isCompleted();
     }
 
     public void addPoints(int points) {
